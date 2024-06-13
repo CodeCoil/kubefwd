@@ -1,3 +1,47 @@
+# IMPORTANT NOTICE
+
+This is a fork of the original repo that provided a patched version of the binaries that fix 
+an issue (mostly on windows) where forwarding fails if any mapping for a pod/service has
+more than 10 hostname aliases (because windows only support a maximum of 10 aliases per line).
+
+Note that there aren't any changes to the actual code here, the fix is actually in the 
+module [github.com/txn2/txeh](https://github.com/txn2) and this fork has been simply updated to 
+reference the module from the forked repo that contains the fix ([github.com/CodeCoil/txeh](github.com/CodeCoil/txeh)).
+
+This repo serve only as a mean to get binaries with the fix.
+
+By default the limit is set to 10 on windows and none for other OSes.
+
+But, although the issue only inpact windows, since this also include a mean to change the number of 
+hostnames that `kubefwd` is allowed to add for a single line in the hosts file, the CI in this repos 
+still also produce binaries for some (no *homebrew*, sorry) non windows platforms.
+
+You can change the limit using the `KUBEFWD_MAX_HOSTNAMES_PER_LINE` environment variable.
+E.g.:
+
+Bash
+
+```bash
+export KUBEFWD_MAX_HOSTNAMES_PER_LINE=1
+```
+
+Windows:
+
+```powershell
+$env:KUBEFWD_MAX_HOSTNAMES_PER_LINE="1"
+```
+
+This will limit the maximum number of hosts for each line to `1`.
+
+> I personally find much easier to deal with multiple entries for the same address, instead of
+> something that *grow horizontally*, so i set the default to 1 on the env of my user.
+
+Apart from the change described above, the rest should work exactly as the original.
+
+> I will try to open an issue/PR on the [upstream repo](github.com/txn2/txeh) as soon as i have more time.
+
+---
+
 [English](https://github.com/txn2/kubefwd/blob/master/README.md)|[中文](https://github.com/txn2/kubefwd/blob/master/README_CN.md)
 
 Kubernetes port forwarding for local development.
@@ -6,10 +50,12 @@ Kubernetes port forwarding for local development.
 
 ![kubefwd - kubernetes bulk port forwarding](https://raw.githubusercontent.com/txn2/kubefwd/master/kubefwd-mast2.jpg)
 
-[![Build Status](https://travis-ci.com/txn2/kubefwd.svg?branch=master)](https://travis-ci.com/txn2/kubefwd)
-[![GitHub license](https://img.shields.io/github/license/txn2/kubefwd.svg)](https://github.com/txn2/kubefwd/blob/master/LICENSE)
-[![Go Report Card](https://goreportcard.com/badge/github.com/txn2/kubefwd)](https://goreportcard.com/report/github.com/txn2/kubefwd)
-[![GitHub release](https://img.shields.io/github/release/txn2/kubefwd.svg)](https://github.com/txn2/kubefwd/releases)
+
+[![Build Status](https://github.com/CodeCoil/kubefwd/actions/workflows/goreleaser.yaml/badge.svg?event=push)](https://github.com/CodeCoil/kubefwd/actions/workflows/goreleaser.yaml)
+[![GitHub license](https://img.shields.io/github/license/txn2/kubefwd.svg)](https://github.com/CodeCoil/kubefwd/blob/master/LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/CodeCoil/kubefwd)](https://goreportcard.com/report/github.com/CodeCoil/kubefwd)
+[![GitHub release](https://img.shields.io/github/release/CodeCoil/kubefwd.svg)](https://github.com/CodeCoil/kubefwd/releases)
+
 
 # kubefwd (Kube Forward)
 
@@ -38,44 +84,18 @@ Ensure you have a context by running:
 kubectl config current-context
 ```
 
-If you are running MacOS and use [homebrew] you can install **kubefwd** directly from the [txn2] tap:
+~~If you are running MacOS and use [homebrew] you can install **kubefwd** directly from the [txn2] tap:~~
 
-```bash
-brew install txn2/tap/kubefwd
-```
-
-To upgrade:
-```bash
-brew upgrade kubefwd
-```
+> Not supported for this fork.
 
 ## Windows Install / Update
 
-```batch
-scoop install kubefwd
-```
-
-To upgrade:
-```batch
-scoop update kubefwd
-```
+> Download binaries from the latest github release. See [Alternative Installs]
 
 ## Docker
 
-Forward all services from the namespace **the-project** to a Docker container named **the-project**:
+> Not supported for this fork.
 
-```bash
-docker run -it --rm --privileged --name the-project \
-    -v "$(echo $HOME)/.kube/":/root/.kube/ \
-    txn2/kubefwd services -n the-project
-```
-
-
-Execute a curl call to an Elasticsearch service in your Kubernetes cluster:
-
-```bash
-docker exec the-project curl -s elasticsearch:9200
-```
 
 ## Alternative Installs (tar.gz, RPM, deb)
 Check out the [releases](https://github.com/txn2/kubefwd/releases) section on Github for alternative binaries.
